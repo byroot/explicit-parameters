@@ -42,6 +42,10 @@ module ExplicitParameters
 
     private
 
+    def param_error!(parameter, error)
+      raise ExplicitParameters::InvalidParameters.new({errors: {parameter => [error]}}.to_json)
+    end
+
     def render_parameters_error(error)
       render json: error.message, status: :unprocessable_entity
     end

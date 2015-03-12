@@ -11,6 +11,11 @@ class DummyController < ActionController::Base
     render json: {value: params.page_size, type: params.page_size.class.name}
   end
 
+  def error
+    param_error!(:page_size, "Out of bound")
+    render text: 'OK'
+  end
+
   def no_declaration
     render text: 'OK'
   end
@@ -36,6 +41,11 @@ RSpec.describe DummyController do
   it 'returns the list of errors if parameters are invalid' do
     get :index, page_size: 'foobar'
     expect(json_response).to be == {errors: {page_size: ['"foobar" is not a valid Integer']}}
+  end
+
+  it 'param_error! interupt the request immediately' do
+    get :error
+    expect(json_response).to be == {errors: {page_size: ['Out of bound']}}
   end
 
   private
