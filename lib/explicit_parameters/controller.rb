@@ -9,7 +9,6 @@ module ExplicitParameters
     end
 
     included do
-      self.parameters = {}
       rescue_from ExplicitParameters::InvalidParameters, with: :render_parameters_error
     end
 
@@ -18,6 +17,7 @@ module ExplicitParameters
 
       def method_added(action)
         return unless Controller.last_parameters
+        self.parameters ||= {}
         parameters[action.to_s] = Controller.last_parameters
         const_set("#{action.to_s.camelize}Parameters", Controller.last_parameters)
         Controller.last_parameters = nil
@@ -28,7 +28,7 @@ module ExplicitParameters
       end
 
       def parse_parameters_for(action_name, params)
-        if declaration = parameters[action_name]
+        if declaration = parameters.try!(:[], action_name)
           declaration.parse!(params)
         else
           params
@@ -36,11 +36,11 @@ module ExplicitParameters
       end
     end
 
-    private
-
     def params
       @validated_params ||= self.class.parse_parameters_for(action_name, super)
     end
+
+    private
 
     def render_parameters_error(error)
       render json: error.message, status: :unprocessable_entity
