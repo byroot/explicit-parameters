@@ -24,15 +24,16 @@ module ExplicitParameters
         new(params).validate!
       end
 
-      def define(&block)
-        Class.new(self, &block)
+      def define(name = nil, &block)
+        name_class(Class.new(self, &block), name)
       end
 
-      def requires(name, type, options = {}, &block)
-        accepts(name, type, options.merge(required: true))
+      def requires(name, type = nil, options = {}, &block)
+        accepts(name, type, options.merge(required: true), &block)
       end
 
-      def accepts(name, type, options = {}, &block)
+      def accepts(name, type = nil, options = {}, &block)
+        type = define(name, &block) if block_given?
         attribute(name, type, options.slice(:default, :required))
         validations = options.except(:default)
         validations[:coercion] = true
@@ -41,6 +42,16 @@ module ExplicitParameters
 
       def optional_attributes
         @optional_attributes ||= []
+      end
+
+      private
+
+      def name_class(klass, name)
+        if name.present?
+          name = name.to_s.camelize
+          klass.singleton_class.send(:define_method, :name) { name }
+        end
+        klass
       end
     end
 
