@@ -2,11 +2,9 @@ require 'spec_helper'
 
 RSpec.describe ExplicitParameters::Parameters do
   TestParameters = ExplicitParameters::Parameters.define do
-    requires :id, Integer
+    requires :id, Integer, numericality: {greater_than: 0}
     accepts :name, String
     accepts :title, String, default: 'Untitled'
-
-    validates :id, numericality: {greater_than: 0}
   end
 
   let :parameters do
