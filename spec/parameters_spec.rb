@@ -33,6 +33,15 @@ RSpec.describe ExplicitParameters::Parameters do
     end
   end
 
+  it 'ignores unexpected parameters when converted to hash' do
+    expect(params.to_hash.keys).to be == %i(id name)
+  end
+
+  it 'ignores unexpected parameters when converted to hash with string keys' do
+    expect(params.stringify_keys.keys).to be == %w(id name)
+  end
+
+
   it 'allows access to raw parameters when accessed like a Hash' do
     expect(params[:id]).to be == '42'
     expect(params[:unexpected]).to be == 'parameter'
