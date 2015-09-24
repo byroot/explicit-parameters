@@ -89,4 +89,62 @@ RSpec.describe ExplicitParameters::Parameters do
       }.to raise_error(ExplicitParameters::InvalidParameters, message)
     end
   end
+
+  context 'with list of parameters' do
+    let :definition do
+      ExplicitParameters::Parameters.define(:nested) do
+        accepts :addresses, Array do
+          requires :street, String
+          requires :city, String
+        end
+      end
+    end
+
+    let :parameters do
+      {
+        'addresses' => [
+          {
+            'street' => '3575 St-Laurent',
+            'city' => 'Montréal',
+          }
+        ]
+      }
+    end
+
+    it 'the exposed parameter is an Array' do
+      expect(params.addresses).to be_an Array
+      expect(params.addresses.size).to be == 1
+    end
+
+    it 'parses nested hashes' do
+      expect(params.addresses.first.street).to be == '3575 St-Laurent'
+      expect(params.addresses.first.city).to be == 'Montréal'
+    end
+
+    context 'when required' do
+      let :definition do
+        ExplicitParameters::Parameters.define(:nested) do
+          requires :addresses, Array do
+            requires :street, String
+            requires :city, String
+          end
+        end
+      end
+
+      it 'reports missing attributes' do
+        message = {errors: {addresses: ['is required']}}.to_json
+        expect {
+          definition.parse!({})
+        }.to raise_error(ExplicitParameters::InvalidParameters, message)
+      end
+
+      it 'considers empty arrays as missing' do
+        message = {errors: {addresses: ['is required']}}.to_json
+        expect {
+          params = definition.parse!({'addresses' => []})
+          p params.addresses
+        }.to raise_error(ExplicitParameters::InvalidParameters, message)
+      end
+    end
+  end
 end

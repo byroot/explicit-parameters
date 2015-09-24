@@ -33,7 +33,16 @@ module ExplicitParameters
       end
 
       def accepts(name, type = nil, options = {}, &block)
-        type = define(name, &block) if block_given?
+        if block_given?
+          subtype = define(name, &block)
+          if type == Array
+            type = Array[subtype]
+          elsif type == nil
+            type = subtype
+          else
+            raise ArgumentError, "`type` argument can only be `nil` or `Array` when a block is provided"
+          end
+        end
         attribute(name, type, options.slice(:default, :required))
         validations = options.except(:default)
         validations[:coercion] = true
@@ -66,7 +75,11 @@ module ExplicitParameters
     end
 
     def validate_attribute_provided!(attribute_name, value)
-      errors.add attribute_name, "is required" unless @original_attributes.key?(attribute_name.to_s)
+      if !@original_attributes.key?(attribute_name.to_s)
+        errors.add attribute_name, 'is required'
+      elsif attribute_set[attribute_name].type.primitive == Array && value == [].freeze
+        errors.add attribute_name, 'is required'
+      end
     end
 
     def validate_attribute_coercion!(attribute_name, value)
