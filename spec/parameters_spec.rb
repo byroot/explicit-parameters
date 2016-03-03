@@ -41,6 +41,9 @@ RSpec.describe ExplicitParameters::Parameters do
     expect(params.stringify_keys.keys).to be == %w(id name)
   end
 
+  it '#reject returns a hash' do
+    expect(params.reject { false }).to be == {id: 42, name: 'George'}
+  end
 
   it 'allows access to raw parameters when accessed like a Hash' do
     expect(params[:id]).to be == '42'
