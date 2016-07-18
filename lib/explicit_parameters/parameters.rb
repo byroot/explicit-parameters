@@ -65,8 +65,9 @@ module ExplicitParameters
     end
 
     def initialize(attributes = {})
+      attributes = attributes.to_unsafe_h if IS_RAILS5 && attributes.respond_to?(:to_unsafe_h)
       @original_attributes = attributes.stringify_keys
-      super
+      super(attributes)
     end
 
     def validate!

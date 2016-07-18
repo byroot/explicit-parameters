@@ -13,11 +13,11 @@ class DummyController < ActionController::Base
 
   def error
     param_error!(:page_size, "Out of bound")
-    render text: 'OK'
+    render body: 'OK'
   end
 
   def no_declaration
-    render text: 'OK'
+    render body: 'OK'
   end
 
 end
@@ -60,12 +60,26 @@ RSpec.describe DummyController do
     request(action, 'GET', query: parameters)
   end
 
-  def request(action, method, query: {}, body: '')
-    rack_response = subject.dispatch(action, ActionDispatch::Request.new(
-      'REQUEST_METHOD' => method,
-      'QUERY_STRING' => query.to_query,
-      'rack.input' => StringIO.new(body)
-    ))
-    @response = ActionDispatch::Response.new(*rack_response)
+  if ActionController::Base.instance_method(:dispatch).arity > 2
+    def request(action, method, query: {}, body: '')
+      request = ActionDispatch::Request.new(
+        'REQUEST_METHOD' => method,
+        'QUERY_STRING' => query.to_query,
+        'rack.input' => StringIO.new(body)
+      )
+      @response = ActionDispatch::Response.create.tap do |res|
+        res.request = request
+      end
+      subject.dispatch(action, request, @response)
+    end
+  else
+    def request(action, method, query: {}, body: '')
+      rack_response = subject.dispatch(action, ActionDispatch::Request.new(
+        'REQUEST_METHOD' => method,
+        'QUERY_STRING' => query.to_query,
+        'rack.input' => StringIO.new(body)
+      ))
+      @response = ActionDispatch::Response.new(*rack_response)
+    end
   end
 end
