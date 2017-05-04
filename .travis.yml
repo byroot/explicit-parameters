@@ -3,5 +3,5 @@ cache: bundler
 rvm:
   2.2.3
 gemfile:
-  - gemfiles/Gemfile.rails-4.2
   - gemfiles/Gemfile.rails-5.0
+  - gemfiles/Gemfile.rails-5.1
