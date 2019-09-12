@@ -30,7 +30,7 @@ RSpec.describe DummyController do
 
   it 'coerce parameters to the required type' do
     get :index, page_size: '42'
-    expect(json_response).to be == {value: 42, type: 'Fixnum'}
+    expect(json_response).to be == {value: 42, type: 'Integer'}
   end
 
   it 'returns a 422 if parameters are invalid' do
