@@ -95,7 +95,7 @@ module ExplicitParameters
       super.except(*missing_attributes)
     end
 
-    delegate :each, :stringify_keys, :reject, :select, to: :to_hash
+    delegate :each, :each_pair, :empty?, :stringify_keys, :reject, :select, to: :to_hash
     delegate :[], to: :@original_attributes
 
     private
