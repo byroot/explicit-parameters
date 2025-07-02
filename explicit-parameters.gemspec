@@ -20,8 +20,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'actionpack', '>= 6.0'
   spec.add_dependency 'activemodel', '>= 6.0'
   spec.add_dependency 'virtus', '~> 1.0'
-
-  spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'rake', '~> 10.0'
-  spec.add_development_dependency 'rspec', '~> 3.0'
+  spec.add_dependency 'ostruct' # needed by virtus. TODO: stop depending on virtus
 end

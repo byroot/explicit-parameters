@@ -1,8 +1,0 @@
-sudo: false
-cache: bundler
-rvm:
-  2.6.4
-gemfile:
-  - gemfiles/Gemfile.rails-6.0
-before_install:
-  - gem install bundler
